@@ -3,9 +3,17 @@ import React, {useState} from 'react';
 function App() {
   const [die1, setDie1] = useState(0);
   const [die2, setDie2] = useState(0);
-  const [availableChoices, setAvailableChoices] = useState(newGame());
+  const [availableChoices, setAvailableChoices] = useState(allChoices());
   const [pickingNumbers, setPickingNumbers] = useState(false);
   const [selectedNumbers, setSelectedNumbers] = useState(new Set());
+
+  const newGame = () => {
+    setDie1(0);
+    setDie2(0);
+    setAvailableChoices(allChoices());
+    setPickingNumbers(false);
+    setSelectedNumbers(new Set());
+  };
 
   const toggleChoice = choice => {
     const newChosenNumbers = new Set(selectedNumbers);
@@ -52,6 +60,9 @@ function App() {
         Dice:
         {!!die1 && <Dice number={die1}/>}
         {!!die2 && <Dice number={die2}/>}
+        <div>
+          <button onClick={newGame}>Start new game</button>
+        </div>
       </div>
     </div>
   );
@@ -87,7 +98,7 @@ const possibleChoices = [...Array(9).keys()].map(i => i + 1);
 
 const rollDice = () => Math.ceil(Math.random()*6);
 
-const newGame = () => new Set([...Array(9).keys()].map(i => i + 1));
+const allChoices = () => new Set([...Array(9).keys()].map(i => i + 1));
 
 const canSelectNumbers = (selectedNumbers, total) => (
   [...selectedNumbers].reduce((a, b) => a + b, 0) === total
