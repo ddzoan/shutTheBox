@@ -1,11 +1,36 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 function App() {
   const [die1, setDie1] = useState(0);
   const [die2, setDie2] = useState(0);
   const [availableChoices, setAvailableChoices] = useState(allChoices());
   const [pickingNumbers, setPickingNumbers] = useState(false);
+  const [needsToRoll, setNeedsToRoll] = useState(true);
   const [selectedNumbers, setSelectedNumbers] = useState(new Set());
+  const [gameOver, setGameOver] = useState(false);
+  const [winner, setWinner] = useState(false);
+
+  console.log('gameState', die1,
+    die2,
+    availableChoices,
+    pickingNumbers,
+    needsToRoll,
+    selectedNumbers,
+    gameOver);
+
+  useEffect(() => {
+    if(!needsToRoll && !isPossible([...availableChoices], 0, die1 + die2)) {
+      setGameOver(true);
+      setNeedsToRoll(false);
+    }
+  }, [needsToRoll]);
+
+  useEffect(() => {
+    if(availableChoices.size === 0) {
+      setGameOver(true);
+      setWinner(true);
+    }
+  });
 
   const newGame = () => {
     setDie1(0);
@@ -13,6 +38,8 @@ function App() {
     setAvailableChoices(allChoices());
     setPickingNumbers(false);
     setSelectedNumbers(new Set());
+    setGameOver(false);
+    setNeedsToRoll(true);
   };
 
   const toggleChoice = choice => {
@@ -26,7 +53,10 @@ function App() {
     [...selectedNumbers].forEach(number => newAvailableChoices.delete(number));
     setAvailableChoices(newAvailableChoices);
     setSelectedNumbers(new Set());
+    setDie1(0)
+    setDie2(0)
     setPickingNumbers(false);
+    setNeedsToRoll(true);
   };
 
   return (
@@ -36,7 +66,8 @@ function App() {
           availableChoices={availableChoices}
           chosenNumbers={selectedNumbers}
           toggleChoice={toggleChoice}
-          disabled={!pickingNumbers} />
+          disabled={!pickingNumbers}
+          gameOver={gameOver} />
         <div>
           <button
             disabled={!pickingNumbers || !canSelectNumbers(selectedNumbers, die1 + die2)}
@@ -48,11 +79,12 @@ function App() {
         <div>
           <button
             onClick={() => {
-              setDie1(rollDice);
-              setDie2(rollDice);
+              setDie1(rollDie);
+              setDie2(rollDie);
+              setNeedsToRoll(false);
               setPickingNumbers(true);
             }}
-            disabled={pickingNumbers}
+            disabled={!needsToRoll}
           >
             Roll
           </button>
@@ -60,9 +92,26 @@ function App() {
         Dice:
         {!!die1 && <Dice number={die1}/>}
         {!!die2 && <Dice number={die2}/>}
-        <div>
-          <button onClick={newGame}>Start new game</button>
-        </div>
+        {
+          gameOver ?
+            (
+              <div>
+                <div>GAME OVER</div>
+                {
+                  winner ?
+                    <div>You shut the box!!!</div>
+                    :
+                    <>
+                      <div>{JSON.stringify([...availableChoices])}</div>
+                      <div>Total <span>{[...availableChoices].reduce((a,b) => a + b, 0)}</span></div>
+                    </>
+                }
+
+                <button onClick={newGame}>Start new game</button>
+              </div>
+            )
+            : <div>not game over</div>
+        }
       </div>
     </div>
   );
@@ -78,7 +127,7 @@ function Dice({number}) {
   );
 }
 
-const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled}) => {
+const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameOver}) => {
   return (
     <div>
       {possibleChoices.map(choice => (
@@ -86,7 +135,7 @@ const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled}) => {
           key={choice}
           disabled={disabled || !availableChoices.has(choice)}
           style={{color: availableChoices.has(choice) && chosenNumbers.has(choice) && 'red'}}
-          onClick={() => toggleChoice(choice)}
+          onClick={() => {!gameOver && toggleChoice(choice)}}
         >
           {choice}
         </button>
@@ -96,10 +145,31 @@ const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled}) => {
 };
 const possibleChoices = [...Array(9).keys()].map(i => i + 1);
 
-const rollDice = () => Math.ceil(Math.random()*6);
+const rollDie = () => Math.ceil(Math.random()*6);
 
 const allChoices = () => new Set([...Array(9).keys()].map(i => i + 1));
 
 const canSelectNumbers = (selectedNumbers, total) => (
   [...selectedNumbers].reduce((a, b) => a + b, 0) === total
 );
+
+const isPossible = (valuesArray, sum, target) => {
+  if(sum === target) {
+    console.log("sum", sum)
+    return true;
+  }
+  if(sum > target) {
+    return false;
+  }
+  for(let i = 0; i < valuesArray.length; i++) {
+    let remainingValues = valuesArray.slice(0); // copy
+    remainingValues.splice(i,1);
+    console.log("depth")
+    if(isPossible(remainingValues, sum + valuesArray[i], target)) {
+      console.log("remainingValues", "valuesArray[i]", "target")
+      console.log(remainingValues, valuesArray[i], target)
+      return true;
+    }
+  }
+  return false;
+};
