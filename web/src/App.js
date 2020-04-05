@@ -46,6 +46,12 @@ function App() {
     setNeedsToRoll(true);
   };
 
+  const rollDice = () => {
+    sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
+    setNeedsToRoll(false);
+    setPickingNumbers(true);
+  };
+
   const toggleChoice = choice => {
     const newChosenNumbers = new Set(selectedNumbers);
     selectedNumbers.has(choice) ? newChosenNumbers.delete(choice) : newChosenNumbers.add(choice);
@@ -81,11 +87,7 @@ function App() {
         </div>
         <div>
           <button
-            onClick={() => {
-              sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
-              setNeedsToRoll(false);
-              setPickingNumbers(true);
-            }}
+            onClick={rollDice}
             disabled={!needsToRoll}
           >
             Roll
@@ -111,7 +113,7 @@ function App() {
                 <button onClick={newGame}>Start new game</button>
               </div>
             )
-            : <div>not game over</div>
+            : <div>{pickingNumbers ? "Select your numbers" : "Roll the dice"}</div>
         }
       </div>
     </div>
