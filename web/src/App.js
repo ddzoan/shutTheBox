@@ -9,14 +9,6 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(false);
 
-  console.log('gameState',
-    dice,
-    availableChoices,
-    pickingNumbers,
-    needsToRoll,
-    selectedNumbers,
-    gameOver);
-
   useEffect(() => {
     if(!needsToRoll && !isPossible([...availableChoices], 0, sumArray(dice))) {
       setGameOver(true);
@@ -26,6 +18,20 @@ function App() {
 
   useEffect(() => {
     if(availableChoices.size === 0) {
+      console.log('gameStateAtWin',
+        "dice",
+        "availableChoices",
+        "pickingNumbers",
+        "needsToRoll",
+        "selectedNumbers",
+        "gameOver");
+      console.log('gameStateAtWin',
+        dice,
+        availableChoices,
+        pickingNumbers,
+        needsToRoll,
+        selectedNumbers,
+        gameOver);
       setGameOver(true);
       setWinner(true);
     }
