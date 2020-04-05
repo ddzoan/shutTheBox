@@ -37,6 +37,41 @@ function App() {
     }
   }, [availableChoices.size]);
 
+  const canFinalizeSelection = pickingNumbers && canSelectNumbers(selectedNumbers, sumArray(dice));
+
+  useEffect(() => {
+    const handleKeypress = event => {
+      switch(event.key) {
+        case "r":
+          rollDice();
+          break;
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+          if(pickingNumbers) {
+            toggleChoice(parseInt(event.key));
+          }
+          break;
+        case "Enter":
+          if(canFinalizeSelection) {
+            finalizeSelection();
+          }
+          break;
+        default:
+          console.log("default", event.key);
+          break;
+      }
+    };
+    window.addEventListener("keypress", handleKeypress);
+    return () => window.removeEventListener("keypress", handleKeypress);
+  });
+
   const newGame = () => {
     setDice([]);
     setAvailableChoices(allChoices());
@@ -47,25 +82,31 @@ function App() {
   };
 
   const rollDice = () => {
-    sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
-    setNeedsToRoll(false);
-    setPickingNumbers(true);
+    if(!gameOver && needsToRoll) {
+      sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
+      setNeedsToRoll(false);
+      setPickingNumbers(true);
+    }
   };
 
   const toggleChoice = choice => {
-    const newChosenNumbers = new Set(selectedNumbers);
-    selectedNumbers.has(choice) ? newChosenNumbers.delete(choice) : newChosenNumbers.add(choice);
-    setSelectedNumbers(newChosenNumbers);
+    if(!gameOver) {
+      const newChosenNumbers = new Set(selectedNumbers);
+      selectedNumbers.has(choice) ? newChosenNumbers.delete(choice) : newChosenNumbers.add(choice);
+      setSelectedNumbers(newChosenNumbers);
+    }
   };
 
   const finalizeSelection = () => {
-    const newAvailableChoices = new Set(availableChoices);
-    [...selectedNumbers].forEach(number => newAvailableChoices.delete(number));
-    setAvailableChoices(newAvailableChoices);
-    setSelectedNumbers(new Set());
-    setDice([]);
-    setPickingNumbers(false);
-    setNeedsToRoll(true);
+    if(!gameOver && !needsToRoll) {
+      const newAvailableChoices = new Set(availableChoices);
+      [...selectedNumbers].forEach(number => newAvailableChoices.delete(number));
+      setAvailableChoices(newAvailableChoices);
+      setSelectedNumbers(new Set());
+      setDice([]);
+      setPickingNumbers(false);
+      setNeedsToRoll(true);
+    }
   };
 
   return (
@@ -79,7 +120,7 @@ function App() {
           gameOver={gameOver} />
         <div>
           <button
-            disabled={!pickingNumbers || !canSelectNumbers(selectedNumbers, sumArray(dice))}
+            disabled={!canFinalizeSelection}
             onClick={finalizeSelection}
           >
             Select these numbers
