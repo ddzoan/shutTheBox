@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 function App() {
-  const [die1, setDie1] = useState(0);
-  const [die2, setDie2] = useState(0);
+  const [dice, setDice] = useState([]);
   const [availableChoices, setAvailableChoices] = useState(allChoices());
   const [pickingNumbers, setPickingNumbers] = useState(false);
   const [needsToRoll, setNeedsToRoll] = useState(true);
@@ -10,8 +9,8 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(false);
 
-  console.log('gameState', die1,
-    die2,
+  console.log('gameState',
+    dice,
     availableChoices,
     pickingNumbers,
     needsToRoll,
@@ -19,7 +18,7 @@ function App() {
     gameOver);
 
   useEffect(() => {
-    if(!needsToRoll && !isPossible([...availableChoices], 0, die1 + die2)) {
+    if(!needsToRoll && !isPossible([...availableChoices], 0, sumArray(dice))) {
       setGameOver(true);
       setNeedsToRoll(false);
     }
@@ -30,11 +29,10 @@ function App() {
       setGameOver(true);
       setWinner(true);
     }
-  });
+  }, [availableChoices.size]);
 
   const newGame = () => {
-    setDie1(0);
-    setDie2(0);
+    setDice([]);
     setAvailableChoices(allChoices());
     setPickingNumbers(false);
     setSelectedNumbers(new Set());
@@ -53,8 +51,7 @@ function App() {
     [...selectedNumbers].forEach(number => newAvailableChoices.delete(number));
     setAvailableChoices(newAvailableChoices);
     setSelectedNumbers(new Set());
-    setDie1(0)
-    setDie2(0)
+    setDice([]);
     setPickingNumbers(false);
     setNeedsToRoll(true);
   };
@@ -70,7 +67,7 @@ function App() {
           gameOver={gameOver} />
         <div>
           <button
-            disabled={!pickingNumbers || !canSelectNumbers(selectedNumbers, die1 + die2)}
+            disabled={!pickingNumbers || !canSelectNumbers(selectedNumbers, sumArray(dice))}
             onClick={finalizeSelection}
           >
             Select these numbers
@@ -79,8 +76,7 @@ function App() {
         <div>
           <button
             onClick={() => {
-              setDie1(rollDie);
-              setDie2(rollDie);
+              setDice([rollDie(), rollDie()]);
               setNeedsToRoll(false);
               setPickingNumbers(true);
             }}
@@ -90,8 +86,7 @@ function App() {
           </button>
         </div>
         Dice:
-        {!!die1 && <Dice number={die1}/>}
-        {!!die2 && <Dice number={die2}/>}
+        {dice.length > 0 && <Dice dice={dice}/>}
         {
           gameOver ?
             (
@@ -103,7 +98,7 @@ function App() {
                     :
                     <>
                       <div>{JSON.stringify([...availableChoices])}</div>
-                      <div>Total <span>{[...availableChoices].reduce((a,b) => a + b, 0)}</span></div>
+                      <div>Total <span>{sumArray([...availableChoices])}</span></div>
                     </>
                 }
 
@@ -119,10 +114,10 @@ function App() {
 
 export default App;
 
-function Dice({number}) {
+function Dice({dice}) {
   return (
     <div>
-      {number}
+      {dice.map(die => <div>{die}</div>)}
     </div>
   );
 }
@@ -150,8 +145,10 @@ const rollDie = () => Math.ceil(Math.random()*6);
 const allChoices = () => new Set([...Array(9).keys()].map(i => i + 1));
 
 const canSelectNumbers = (selectedNumbers, total) => (
-  [...selectedNumbers].reduce((a, b) => a + b, 0) === total
+  sumArray([...selectedNumbers]) === total
 );
+
+const sumArray = (arr) => arr.reduce((a, b) => a + b, 0);
 
 const isPossible = (valuesArray, sum, target) => {
   if(sum === target) {
