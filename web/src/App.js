@@ -82,7 +82,7 @@ function App() {
         <div>
           <button
             onClick={() => {
-              Math.max(...[...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
+              sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
               setNeedsToRoll(false);
               setPickingNumbers(true);
             }}
