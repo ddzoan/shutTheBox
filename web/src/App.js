@@ -25,6 +25,7 @@ function App() {
         "needsToRoll",
         "selectedNumbers",
         "gameOver");
+      console.log('availableChoices.size is equal to zero apparently?', availableChoices.size);
       console.log('gameStateAtWin',
         dice,
         availableChoices,
@@ -32,6 +33,7 @@ function App() {
         needsToRoll,
         selectedNumbers,
         gameOver);
+
       setGameOver(true);
       setWinner(true);
     }
@@ -44,6 +46,9 @@ function App() {
       switch(event.key) {
         case "r":
           rollDice();
+          break;
+        case "n":
+          newGame();
           break;
         case "1":
         case "2":
@@ -83,6 +88,7 @@ function App() {
 
   const rollDice = () => {
     if(!gameOver && needsToRoll) {
+      console.log("rolling");
       sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
       setNeedsToRoll(false);
       setPickingNumbers(true);
@@ -90,7 +96,7 @@ function App() {
   };
 
   const toggleChoice = choice => {
-    if(!gameOver) {
+    if(!gameOver && availableChoices.has(choice)) {
       const newChosenNumbers = new Set(selectedNumbers);
       selectedNumbers.has(choice) ? newChosenNumbers.delete(choice) : newChosenNumbers.add(choice);
       setSelectedNumbers(newChosenNumbers);
@@ -99,6 +105,7 @@ function App() {
 
   const finalizeSelection = () => {
     if(!gameOver && !needsToRoll) {
+      console.log("finalize selection")
       const newAvailableChoices = new Set(availableChoices);
       [...selectedNumbers].forEach(number => newAvailableChoices.delete(number));
       setAvailableChoices(newAvailableChoices);
@@ -166,7 +173,7 @@ export default App;
 function Dice({dice}) {
   return (
     <div>
-      {dice.map(die => <div>{die}</div>)}
+      {dice.map((die, i) => <div key={`die${i}`}>{die}</div>)}
     </div>
   );
 }
@@ -201,7 +208,6 @@ const sumArray = (arr) => arr.reduce((a, b) => a + b, 0);
 
 const isPossible = (valuesArray, sum, target) => {
   if(sum === target) {
-    console.log("sum", sum)
     return true;
   }
   if(sum > target) {
@@ -210,10 +216,10 @@ const isPossible = (valuesArray, sum, target) => {
   for(let i = 0; i < valuesArray.length; i++) {
     let remainingValues = valuesArray.slice(0); // copy
     remainingValues.splice(i,1);
-    console.log("depth")
+    // console.log("depth")
     if(isPossible(remainingValues, sum + valuesArray[i], target)) {
-      console.log("remainingValues", "valuesArray[i]", "target")
-      console.log(remainingValues, valuesArray[i], target)
+      // console.log("remainingValues", "valuesArray[i]", "target")
+      // console.log(remainingValues, valuesArray[i], target)
       return true;
     }
   }
