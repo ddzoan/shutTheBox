@@ -1,43 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useReducer} from 'react';
 
 function App() {
-  const [dice, setDice] = useState([]);
-  const [availableChoices, setAvailableChoices] = useState(allChoices());
-  const [pickingNumbers, setPickingNumbers] = useState(false);
-  const [needsToRoll, setNeedsToRoll] = useState(true);
-  const [selectedNumbers, setSelectedNumbers] = useState(new Set());
-  const [gameOver, setGameOver] = useState(false);
-  const [winner, setWinner] = useState(false);
-
-  useEffect(() => {
-    if(!needsToRoll && !isPossible([...availableChoices], 0, sumArray(dice))) {
-      setGameOver(true);
-      setNeedsToRoll(false);
-    }
-  }, [needsToRoll]);
-
-  useEffect(() => {
-    if(availableChoices.size === 0) {
-      console.log('gameStateAtWin',
-        "dice",
-        "availableChoices",
-        "pickingNumbers",
-        "needsToRoll",
-        "selectedNumbers",
-        "gameOver");
-      console.log('availableChoices.size is equal to zero apparently?', availableChoices.size);
-      console.log('gameStateAtWin',
-        dice,
-        availableChoices,
-        pickingNumbers,
-        needsToRoll,
-        selectedNumbers,
-        gameOver);
-
-      setGameOver(true);
-      setWinner(true);
-    }
-  }, [availableChoices.size]);
+  const [state, dispatch] = useReducer(reducer, null, getInitialState);
+  const {dice, availableChoices, pickingNumbers, needsToRoll, selectedNumbers, gameOver, winner} = state;
 
   const canFinalizeSelection = pickingNumbers && canSelectNumbers(selectedNumbers, sumArray(dice));
 
@@ -45,10 +10,10 @@ function App() {
     const handleKeypress = event => {
       switch(event.key) {
         case "r":
-          rollDice();
+          dispatch({type: "ROLL_DICE"});
           break;
         case "n":
-          newGame();
+          dispatch({type: "NEW_GAME"});
           break;
         case "1":
         case "2":
@@ -60,16 +25,15 @@ function App() {
         case "8":
         case "9":
           if(pickingNumbers) {
-            toggleChoice(parseInt(event.key));
+            dispatch({type: "TOGGLE_CHOICE", payload: parseInt(event.key)});
           }
           break;
         case "Enter":
           if(canFinalizeSelection) {
-            finalizeSelection();
+            dispatch({type: "FINALIZE_SELECTION"});
           }
           break;
         default:
-          console.log("default", event.key);
           break;
       }
     };
@@ -77,65 +41,26 @@ function App() {
     return () => window.removeEventListener("keypress", handleKeypress);
   });
 
-  const newGame = () => {
-    setDice([]);
-    setAvailableChoices(allChoices());
-    setPickingNumbers(false);
-    setSelectedNumbers(new Set());
-    setGameOver(false);
-    setNeedsToRoll(true);
-  };
-
-  const rollDice = () => {
-    if(!gameOver && needsToRoll) {
-      console.log("rolling");
-      sumArray([...availableChoices]) > 6 ? setDice([rollDie(), rollDie()]) : setDice([rollDie()]);
-      setNeedsToRoll(false);
-      setPickingNumbers(true);
-    }
-  };
-
-  const toggleChoice = choice => {
-    if(!gameOver && availableChoices.has(choice)) {
-      const newChosenNumbers = new Set(selectedNumbers);
-      selectedNumbers.has(choice) ? newChosenNumbers.delete(choice) : newChosenNumbers.add(choice);
-      setSelectedNumbers(newChosenNumbers);
-    }
-  };
-
-  const finalizeSelection = () => {
-    if(!gameOver && !needsToRoll) {
-      console.log("finalize selection")
-      const newAvailableChoices = new Set(availableChoices);
-      [...selectedNumbers].forEach(number => newAvailableChoices.delete(number));
-      setAvailableChoices(newAvailableChoices);
-      setSelectedNumbers(new Set());
-      setDice([]);
-      setPickingNumbers(false);
-      setNeedsToRoll(true);
-    }
-  };
-
   return (
     <div className="App">
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <Numbers
           availableChoices={availableChoices}
           chosenNumbers={selectedNumbers}
-          toggleChoice={toggleChoice}
+          toggleChoice={choice => dispatch({type: "TOGGLE_CHOICE", payload: choice})}
           disabled={!pickingNumbers}
           gameOver={gameOver} />
         <div>
           <button
             disabled={!canFinalizeSelection}
-            onClick={finalizeSelection}
+            onClick={() => dispatch({type: "FINALIZE_SELECTION"})}
           >
             Select these numbers
           </button>
         </div>
         <div>
           <button
-            onClick={rollDice}
+            onClick={() => dispatch({type: "ROLL_DICE"})}
             disabled={!needsToRoll}
           >
             Roll
@@ -158,7 +83,7 @@ function App() {
                     </>
                 }
 
-                <button onClick={newGame}>Start new game</button>
+                <button onClick={() => dispatch({type: "NEW_GAME"})}>Start new game</button>
               </div>
             )
             : <div>{pickingNumbers ? "Select your numbers" : "Roll the dice"}</div>
@@ -216,12 +141,94 @@ const isPossible = (valuesArray, sum, target) => {
   for(let i = 0; i < valuesArray.length; i++) {
     let remainingValues = valuesArray.slice(0); // copy
     remainingValues.splice(i,1);
-    // console.log("depth")
     if(isPossible(remainingValues, sum + valuesArray[i], target)) {
-      // console.log("remainingValues", "valuesArray[i]", "target")
-      // console.log(remainingValues, valuesArray[i], target)
       return true;
     }
   }
   return false;
 };
+
+const getInitialState = () => ({
+  dice: [],
+  availableChoices: allChoices(),
+  pickingNumbers: false,
+  needsToRoll: true,
+  selectedNumbers: new Set(),
+  gameOver: false,
+  winner: false,
+});
+
+const reducer = (state, action) => {
+  switch(action.type) {
+    case "ROLL_DICE":
+      return rollDiceReducer(state);
+    case "TOGGLE_CHOICE":
+      return toggleChoiceReducer(state, action.payload);
+    case "FINALIZE_SELECTION":
+      return finalizeSelectionReducer(state);
+    case "NEW_GAME":
+      return newGameReducer();
+    default:
+      return state;
+  }
+};
+
+const rollDiceReducer = (state) => {
+  const {gameOver, needsToRoll, availableChoices} = state;
+  if(gameOver || !needsToRoll) {
+    return state;
+  }
+  const shouldRollTwoDice = sumArray([...availableChoices]) > 6;
+  const dice = shouldRollTwoDice ? [rollDie(), rollDie()] : [rollDie()];
+
+  const isGameOver = !isPossible([...availableChoices], 0, sumArray(dice));
+  return {
+    dice,
+    availableChoices,
+    pickingNumbers: !isGameOver,
+    needsToRoll: false,
+    selectedNumbers: new Set(),
+    gameOver: isGameOver,
+    winner: false,
+  }
+};
+
+const toggleChoiceReducer = (state, choice) => {
+  const {gameOver, availableChoices, selectedNumbers} = state;
+  if(gameOver || !availableChoices.has(choice)) {
+    return state;
+  }
+  const newSelectedNumbers = new Set(selectedNumbers);
+  const action = selectedNumbers.has(choice) ? "delete" : "add";
+  newSelectedNumbers[action](choice);
+  return {
+    ...state,
+    selectedNumbers: newSelectedNumbers
+  };
+};
+
+const finalizeSelectionReducer = (state) => {
+  const {gameOver, needsToRoll, availableChoices, selectedNumbers} = state;
+  if(gameOver || needsToRoll || !selectedNumbersValid(selectedNumbers, availableChoices)) {
+    return state;
+  }
+  const newAvailableChoices = new Set(availableChoices);
+  selectedNumbers.forEach(num => newAvailableChoices.delete(num));
+
+  const isWinner = newAvailableChoices.size === 0;
+
+  return {
+    dice: [],
+    availableChoices: newAvailableChoices,
+    pickingNumbers: false,
+    needsToRoll: true,
+    selectedNumbers: new Set(),
+    gameOver: isWinner,
+    winner: isWinner,
+  };
+};
+
+const selectedNumbersValid = (selectedNumbers, availableNumbers) =>
+  [...selectedNumbers].every(num => availableNumbers.has(num));
+
+const newGameReducer = () => getInitialState();
