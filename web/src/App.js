@@ -1,4 +1,5 @@
 import React, {useEffect, useReducer} from 'react';
+import Dice from './dice';
 
 function App() {
   const [state, dispatch] = useReducer(reducer, null, getInitialState);
@@ -94,14 +95,6 @@ function App() {
 }
 
 export default App;
-
-function Dice({dice}) {
-  return (
-    <div>
-      {dice.map((die, i) => <div key={`die${i}`}>{die}</div>)}
-    </div>
-  );
-}
 
 const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameOver}) => {
   return (
