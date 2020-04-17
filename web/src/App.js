@@ -48,7 +48,7 @@ function App() {
           availableChoices={availableChoices}
           chosenNumbers={selectedNumbers}
           toggleChoice={choice => dispatch({type: "TOGGLE_CHOICE", payload: choice})}
-          disabled={!pickingNumbers}
+          disabled={!(gameOver || pickingNumbers)}
           gameOver={gameOver} />
         <div>
           <button
@@ -67,7 +67,7 @@ function App() {
           </button>
         </div>
         Dice:
-        {dice.length > 0 && <Dice dice={dice}/>}
+        <Dice dice={dice}/>
         {
           gameOver ?
             (
@@ -218,7 +218,7 @@ const finalizeSelectionReducer = (state) => {
   const isWinner = newAvailableChoices.size === 0;
 
   return {
-    dice: [],
+    dice: state.dice,
     availableChoices: newAvailableChoices,
     pickingNumbers: false,
     needsToRoll: true,
