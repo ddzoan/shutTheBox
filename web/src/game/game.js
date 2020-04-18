@@ -1,7 +1,7 @@
 import React, {useReducer} from "react";
 import Dice from "./dice";
 import reducer, {getInitialState, ROLL_DICE, NEW_GAME, FINALIZE_SELECTION, TOGGLE_CHOICE} from './gameReducer';
-import {sumArray, possibleChoices, canFinalizeSelection} from './gameHelpers';
+import {sumArray, possibleChoices, canFinalizeSelection, canSelectNumbers} from './gameHelpers';
 import {useKeyboardShortcuts} from "./gameKeyboardShortcuts";
 
 const Game = () => {
@@ -20,7 +20,7 @@ const Game = () => {
         gameOver={gameOver} />
       <div>
         <button
-          disabled={!canFinalizeSelection(pickingNumbers, selectedNumbers, dice)}
+          disabled={!pickingNumbers || !canSelectNumbers(selectedNumbers, sumArray(dice))}
           onClick={() => dispatch({type: FINALIZE_SELECTION})}
         >
           Select these numbers

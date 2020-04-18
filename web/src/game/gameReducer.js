@@ -1,4 +1,4 @@
-import {sumArray, isPossible, canFinalizeSelection} from "./gameHelpers";
+import {sumArray, isPossible, canFinalizeSelection, canSelectNumbers} from "./gameHelpers";
 export const ROLL_DICE = "ROLL_DICE";
 export const TOGGLE_CHOICE = "TOGGLE_CHOICE";
 export const FINALIZE_SELECTION = "FINALIZE_SELECTION";
@@ -13,7 +13,7 @@ const reducer = (state, action) => {
     case FINALIZE_SELECTION:
       return finalizeSelectionReducer(state);
     case NEW_GAME:
-      return newGameReducer();
+      return newGameReducer(state);
     default:
       return state;
   }
@@ -34,7 +34,7 @@ const rollDiceReducer = (state) => {
   if(gameOver || !needsToRoll) {
     return state;
   }
-  const shouldRollTwoDice = sumArray([...availableChoices]) > 6;
+  const shouldRollTwoDice = sumArray([...availableChoices]) >= 6;
   const dice = shouldRollTwoDice ? [rollDie(), rollDie()] : [rollDie()];
 
   const isGameOver = !isPossible([...availableChoices], 0, sumArray(dice));
@@ -68,8 +68,9 @@ const finalizeSelectionReducer = (state) => {
   if(
     gameOver ||
     needsToRoll ||
+    !pickingNumbers ||
     !selectedNumbersValid(selectedNumbers, availableChoices) ||
-    !canFinalizeSelection(pickingNumbers, selectedNumbers, dice)
+    !canSelectNumbers(selectedNumbers, sumArray(dice))
   ) {
     return state;
   }
@@ -96,6 +97,6 @@ const rollDie = () => Math.ceil(Math.random()*6);
 
 const allChoices = () => new Set([...Array(9).keys()].map(i => i + 1));
 
-const newGameReducer = () => getInitialState();
+const newGameReducer = (state) => getInitialState(state.dice);
 
 export default reducer;

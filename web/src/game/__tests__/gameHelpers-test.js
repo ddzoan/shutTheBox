@@ -54,22 +54,4 @@ describe('gameHelpers', function () {
       expect(sumArray([-1,-2])).toEqual(-3);
     });
   });
-
-  describe('canFinalizeSelection', function () {
-    it('should be false when not picking numbers', function () {
-      expect(canFinalizeSelection(false, new Set([1]), [1])).toEqual(false);
-      expect(canFinalizeSelection(false, new Set([1, 2]), [3])).toEqual(false);
-      expect(canFinalizeSelection(false, new Set([1, 2]), [2])).toEqual(false);
-    });
-
-    it('should be true when picking numbers and valid picks', function () {
-      expect(canFinalizeSelection(true, new Set([1]), [1])).toEqual(true);
-      expect(canFinalizeSelection(true, new Set([1, 2]), [3])).toEqual(true);
-    });
-
-    it('should be false when picking numbers and invalid picks', function () {
-      expect(canFinalizeSelection(true, new Set([1]), [2])).toEqual(false);
-      expect(canFinalizeSelection(true, new Set([1, 2]), [4])).toEqual(false);
-    });
-  });
 });
