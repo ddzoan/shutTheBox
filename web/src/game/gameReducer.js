@@ -1,4 +1,4 @@
-import {sumArray, isPossible, canFinalizeSelection, canSelectNumbers} from "./gameHelpers";
+import {sumArray, isPossible, canSelectNumbers} from "./gameHelpers";
 export const ROLL_DICE = "ROLL_DICE";
 export const TOGGLE_CHOICE = "TOGGLE_CHOICE";
 export const FINALIZE_SELECTION = "FINALIZE_SELECTION";

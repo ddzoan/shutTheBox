@@ -1,20 +1,19 @@
 .dice-bg {
-    background: #277714;
     display: grid;
     grid-template-columns: 1fr;
-    height: 400px;
+    /*height: 400px;*/
     overflow: hidden;
-    width: 600px;
+    /*width: 600px;*/
 }
 
 .dice {
     align-items: center;
     display: grid;
-    grid-gap: 2rem;
+    grid-gap: 32px;
     grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
     grid-template-rows: auto;
     justify-items: center;
-    padding: 2rem;
+    padding: 64px 64px 80px 64px;
     perspective: 600px;
 }
 .die-list {

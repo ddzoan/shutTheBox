@@ -1,4 +1,4 @@
-import {isPossible, canSelectNumbers, possibleChoices, sumArray, canFinalizeSelection} from "../gameHelpers";
+import {isPossible, canSelectNumbers, possibleChoices, sumArray} from "../gameHelpers";
 
 describe('gameHelpers', function () {
   describe('isPossible', function () {
