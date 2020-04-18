@@ -46,8 +46,8 @@ describe('reducer', function () {
     });
 
     describe('number of dice rolled', function () {
-      it('should roll two dice if the available numbers sum to 6+', function () {
-        readyToRollState.availableChoices = new Set([1,2,3]);
+      it('should roll two dice if the available numbers sum is over 6', function () {
+        readyToRollState.availableChoices = new Set([1,2,4]);
         const newState = reducer(readyToRollState, {type: ROLL_DICE});
         expect(newState.dice.length).toEqual(2);
       });

@@ -34,7 +34,7 @@ const rollDiceReducer = (state) => {
   if(gameOver || !needsToRoll) {
     return state;
   }
-  const shouldRollTwoDice = sumArray([...availableChoices]) >= 6;
+  const shouldRollTwoDice = sumArray([...availableChoices]) > 6;
   const dice = shouldRollTwoDice ? [rollDie(), rollDie()] : [rollDie()];
 
   const isGameOver = !isPossible([...availableChoices], 0, sumArray(dice));
