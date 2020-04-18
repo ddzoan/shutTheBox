@@ -67,7 +67,6 @@ function App() {
             Roll
           </button>
         </div>
-        Dice:
         <Dice dice={dice} needsToRoll={needsToRoll}/>
         {
           gameOver ?
