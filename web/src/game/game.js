@@ -1,68 +1,34 @@
-import React, {useEffect, useReducer} from "react";
+import React, {useReducer} from "react";
 import Dice from "./dice";
-import reducer, {getInitialState} from './gameReducer';
-import {canSelectNumbers, sumArray, possibleChoices} from './gameHelpers';
+import reducer, {getInitialState, ROLL_DICE, NEW_GAME, FINALIZE_SELECTION, TOGGLE_CHOICE} from './gameReducer';
+import {sumArray, possibleChoices, canFinalizeSelection} from './gameHelpers';
+import {useKeyboardShortcuts} from "./gameKeyboardShortcuts";
 
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, null, getInitialState);
   const {dice, availableChoices, pickingNumbers, needsToRoll, selectedNumbers, gameOver, winner} = state;
 
-  const canFinalizeSelection = pickingNumbers && canSelectNumbers(selectedNumbers, sumArray(dice));
-
-  useEffect(() => {
-    const handleKeypress = event => {
-      switch(event.key) {
-        case "r":
-          dispatch({type: "ROLL_DICE"});
-          break;
-        case "n":
-          dispatch({type: "NEW_GAME"});
-          break;
-        case "1":
-        case "2":
-        case "3":
-        case "4":
-        case "5":
-        case "6":
-        case "7":
-        case "8":
-        case "9":
-          if(pickingNumbers) {
-            dispatch({type: "TOGGLE_CHOICE", payload: parseInt(event.key)});
-          }
-          break;
-        case "Enter":
-          if(canFinalizeSelection) {
-            dispatch({type: "FINALIZE_SELECTION"});
-          }
-          break;
-        default:
-          break;
-      }
-    };
-    window.addEventListener("keypress", handleKeypress);
-    return () => window.removeEventListener("keypress", handleKeypress);
-  });
+  useKeyboardShortcuts(dispatch);
 
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
       <Numbers
         availableChoices={availableChoices}
         chosenNumbers={selectedNumbers}
-        toggleChoice={choice => dispatch({type: "TOGGLE_CHOICE", payload: choice})}
+        toggleChoice={choice => dispatch({type: TOGGLE_CHOICE, payload: choice})}
         disabled={!(gameOver || pickingNumbers)}
         gameOver={gameOver} />
       <div>
         <button
-          disabled={!canFinalizeSelection}
-          onClick={() => dispatch({type: "FINALIZE_SELECTION"})}
+          disabled={!canFinalizeSelection(pickingNumbers, selectedNumbers, dice)}
+          onClick={() => dispatch({type: FINALIZE_SELECTION})}
         >
           Select these numbers
         </button>
       </div>
       <div>
         <button
-          onClick={() => dispatch({type: "ROLL_DICE"})}
+          onClick={() => dispatch({type: ROLL_DICE})}
           disabled={!needsToRoll}
         >
           Roll
@@ -84,7 +50,7 @@ const Game = () => {
                   </>
               }
 
-              <button onClick={() => dispatch({type: "NEW_GAME"})}>Start new game</button>
+              <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
             </div>
           )
           : <div>{pickingNumbers ? "Select your numbers" : "Roll the dice"}</div>

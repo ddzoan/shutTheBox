@@ -22,3 +22,5 @@ export const canSelectNumbers = (selectedNumbers, total) => (
 export const possibleChoices = [...Array(9).keys()].map(i => i + 1);
 
 export const sumArray = (arr) => arr.reduce((a, b) => a + b, 0);
+
+export const canFinalizeSelection = (pickingNumbers, selectedNumbers, dice) => pickingNumbers && canSelectNumbers(selectedNumbers, sumArray(dice));

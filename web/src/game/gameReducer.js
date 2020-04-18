@@ -1,14 +1,18 @@
-import {sumArray, isPossible} from "./gameHelpers";
+import {sumArray, isPossible, canFinalizeSelection} from "./gameHelpers";
+export const ROLL_DICE = "ROLL_DICE";
+export const TOGGLE_CHOICE = "TOGGLE_CHOICE";
+export const FINALIZE_SELECTION = "FINALIZE_SELECTION";
+export const NEW_GAME = "NEW_GAME";
 
 const reducer = (state, action) => {
   switch(action.type) {
-    case "ROLL_DICE":
+    case ROLL_DICE:
       return rollDiceReducer(state);
-    case "TOGGLE_CHOICE":
+    case TOGGLE_CHOICE:
       return toggleChoiceReducer(state, action.payload);
-    case "FINALIZE_SELECTION":
+    case FINALIZE_SELECTION:
       return finalizeSelectionReducer(state);
-    case "NEW_GAME":
+    case NEW_GAME:
       return newGameReducer();
     default:
       return state;
@@ -46,8 +50,8 @@ const rollDiceReducer = (state) => {
 };
 
 const toggleChoiceReducer = (state, choice) => {
-  const {gameOver, availableChoices, selectedNumbers} = state;
-  if(gameOver || !availableChoices.has(choice)) {
+  const {gameOver, availableChoices, selectedNumbers, pickingNumbers} = state;
+  if(gameOver || !availableChoices.has(choice) || !pickingNumbers) {
     return state;
   }
   const newSelectedNumbers = new Set(selectedNumbers);
@@ -60,8 +64,13 @@ const toggleChoiceReducer = (state, choice) => {
 };
 
 const finalizeSelectionReducer = (state) => {
-  const {gameOver, needsToRoll, availableChoices, selectedNumbers} = state;
-  if(gameOver || needsToRoll || !selectedNumbersValid(selectedNumbers, availableChoices)) {
+  const {gameOver, needsToRoll, availableChoices, selectedNumbers, pickingNumbers, dice} = state;
+  if(
+    gameOver ||
+    needsToRoll ||
+    !selectedNumbersValid(selectedNumbers, availableChoices) ||
+    !canFinalizeSelection(pickingNumbers, selectedNumbers, dice)
+  ) {
     return state;
   }
   const newAvailableChoices = new Set(availableChoices);
