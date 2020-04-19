@@ -67,22 +67,27 @@ const Game = () => {
 
 const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameOver}) => {
   return (
-    <div>
+    <div className={css(styles.numbersContainer)} style={{backgroundImage: `url(${woodPattern})`}}>
       {possibleChoices.map(choice => (
-        <button
+        <Number
           key={choice}
+          number={choice}
           disabled={disabled || !availableChoices.has(choice)}
-          style={{color: availableChoices.has(choice) && chosenNumbers.has(choice) && 'red'}}
+          selected={availableChoices.has(choice) && chosenNumbers.has(choice)}
           onClick={() => {
             !gameOver && toggleChoice(choice)
           }}
-        >
-          {choice}
-        </button>
+        />
       ))}
     </div>
   );
 };
+
+const Number = ({number, disabled, selected, onClick}) => (
+  <Clickable className={css(disabled && styles.numberDisabledOverlay)} onClick={() => !disabled && onClick(number)}>
+    <div className={css(styles.number, disabled && styles.numberDisabled, selected && styles.numberSelected)}>{number}</div>
+  </Clickable>
+);
 
 export default Game;
 
@@ -98,5 +103,45 @@ const styles = StyleSheet.create({
   diceSurface: {
     backgroundImage: 'none',
     backgroundColor: '#076324',
-  }
+  },
+  numbersContainer: {
+    display: 'inline-flex',
+    backgroundColor: '#5e4300',
+  },
+  number: {
+    padding: '16px',
+    fontWeight: 'bold',
+    fontSize: '32px',
+    color: 'white',
+    border: 'solid black 2px',
+    cursor: 'pointer',
+    height: '96px',
+    width: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  numberSelected: {
+    borderColor: 'yellow',
+  },
+  numberDisabled: {
+    color: 'black',
+  },
+  numberDisabledOverlay: {
+    cursor: 'unset',
+    opacity: 0.5,
+    backgroundColor: 'white',
+  },
 });
+
+const clickableKeyPress = (onClick, event) => {
+  if(event.key === ' ' || event.key === 'Enter') {
+    onClick(event);
+  }
+};
+
+const Clickable = ({children, onClick, ...props}) => (
+  <div onKeyPress={clickableKeyPress.bind(null, onClick)} onClick={onClick} role="button" tabIndex="0" {...props}>
+    {children}
+  </div>
+);

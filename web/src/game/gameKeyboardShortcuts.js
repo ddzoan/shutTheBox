@@ -22,7 +22,7 @@ export const useKeyboardShortcuts = (dispatch) => {
         case "9":
           dispatch({type: TOGGLE_CHOICE, payload: parseInt(event.key)});
           break;
-        case "Enter":
+        case "f":
           dispatch({type: FINALIZE_SELECTION});
           break;
         default:
