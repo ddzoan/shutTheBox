@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
   },
   boxContainer: {
     display: 'flex',
+    alignItems: 'center',
     flexDirection: 'column',
     flex: 1,
     padding: '24px',
@@ -116,17 +117,18 @@ const styles = StyleSheet.create({
   },
   diceSurface: {
     flex: 1,
+    width: '100%',
     backgroundImage: 'none',
     backgroundColor: '#076324',
   },
   allNumbersContainer: {
-    display: 'inline-flex',
+    display: 'flex',
     backgroundColor: '#5e4300',
     width: '100%',
     maxWidth: '960px',
     height: '96px',
     '@media only screen and (max-width: 479px)': {
-      height: '48px',
+      height: '72px',
     },
   },
   numberContainer: {
