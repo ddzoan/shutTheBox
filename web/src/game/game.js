@@ -67,7 +67,7 @@ const Game = () => {
 
 const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameOver}) => {
   return (
-    <div className={css(styles.numbersContainer)} style={{backgroundImage: `url(${woodPattern})`}}>
+    <div className={css(styles.allNumbersContainer)} style={{backgroundImage: `url(${woodPattern})`}}>
       {possibleChoices.map(choice => (
         <Number
           key={choice}
@@ -84,8 +84,15 @@ const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameO
 };
 
 const Number = ({number, disabled, selected, onClick}) => (
-  <Clickable className={css(disabled && styles.numberDisabledOverlay)} onClick={() => !disabled && onClick(number)}>
-    <div className={css(styles.number, disabled && styles.numberDisabled, selected && styles.numberSelected)}>{number}</div>
+  <Clickable
+    className={css(
+      styles.numberContainer,
+      disabled && styles.numberDisabledOverlay,
+      selected && styles.numberSelected
+    )}
+    onClick={() => !disabled && onClick(number)}
+  >
+    <div className={css(styles.number, disabled && styles.numberDisabled)}>{number}</div>
   </Clickable>
 );
 
@@ -95,34 +102,53 @@ const styles = StyleSheet.create({
   gameContainer: {
     display: 'flex',
     flexDirection: 'column',
+    height: '100vh',
   },
   boxContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
     padding: '24px',
     backgroundColor: '#571e00',
+    '@media only screen and (max-width: 479px)': {
+      padding: '24px 0 24px',
+    },
   },
   diceSurface: {
+    flex: 1,
     backgroundImage: 'none',
     backgroundColor: '#076324',
   },
-  numbersContainer: {
+  allNumbersContainer: {
     display: 'inline-flex',
     backgroundColor: '#5e4300',
-  },
-  number: {
-    padding: '16px',
-    fontWeight: 'bold',
-    fontSize: '32px',
-    color: 'white',
-    border: 'solid black 2px',
-    cursor: 'pointer',
+    width: '100%',
+    maxWidth: '960px',
     height: '96px',
-    width: '32px',
+    '@media only screen and (max-width: 479px)': {
+      height: '48px',
+    },
+  },
+  numberContainer: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    border: 'solid black 2px',
+    flex: 1,
   },
   numberSelected: {
     borderColor: 'yellow',
+  },
+  number: {
+    flex: 1,
+    fontSize: '32px',
+    fontWeight: 'bold',
+    color: 'white',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '@media only screen and (max-width: 479px)': {
+      fontSize: '16px',
+    },
   },
   numberDisabled: {
     color: 'black',
