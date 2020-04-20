@@ -98,6 +98,9 @@ const Number = ({number, disabled, selected, onClick}) => (
 
 export default Game;
 
+const NUMBER_HEIGHT = 120;
+const NUMBER_HEIGHT_MOBILE = 72;
+
 const styles = StyleSheet.create({
   gameContainer: {
     display: 'flex',
@@ -110,9 +113,10 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 1,
     padding: '24px',
+    paddingBottom: NUMBER_HEIGHT_MOBILE - 24,
     backgroundColor: '#571e00',
     '@media only screen and (max-width: 479px)': {
-      padding: '24px 0 24px',
+      padding: '24px 0 48px',
     },
   },
   diceSurface: {
@@ -126,9 +130,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#5e4300',
     width: '100%',
     maxWidth: '960px',
-    height: '96px',
+    height: NUMBER_HEIGHT,
     '@media only screen and (max-width: 479px)': {
-      height: '72px',
+      height: NUMBER_HEIGHT_MOBILE,
     },
   },
   numberContainer: {
