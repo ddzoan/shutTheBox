@@ -30,35 +30,37 @@ const Game = () => {
           </button>
         </div>
         <div className={css(styles.diceSurface)}>
-          <div>
-            <button
-              onClick={() => dispatch({type: ROLL_DICE})}
-              disabled={!needsToRoll}
-            >
-              Roll
-            </button>
+          <div className={css(styles.actionsContainer)}>
+            <div>
+              <button
+                onClick={() => dispatch({type: ROLL_DICE, dispatch})}
+                disabled={!needsToRoll}
+              >
+                Roll
+              </button>
+            </div>
+            {
+              gameOver ?
+                (
+                  <div>
+                    <div>GAME OVER</div>
+                    {
+                      winner ?
+                        <div>You shut the box!!!</div>
+                        :
+                        <>
+                          <div>{JSON.stringify([...availableChoices])}</div>
+                          <div>Total <span>{sumArray([...availableChoices])}</span></div>
+                        </>
+                    }
+
+                    <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
+                  </div>
+                )
+                : <div>{pickingNumbers ? "Select your numbers" : "Roll the dice"}</div>
+            }
           </div>
           <Dice dice={dice} needsToRoll={needsToRoll}/>
-          {
-            gameOver ?
-              (
-                <div>
-                  <div>GAME OVER</div>
-                  {
-                    winner ?
-                      <div>You shut the box!!!</div>
-                      :
-                      <>
-                        <div>{JSON.stringify([...availableChoices])}</div>
-                        <div>Total <span>{sumArray([...availableChoices])}</span></div>
-                      </>
-                  }
-
-                  <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
-                </div>
-              )
-              : <div>{pickingNumbers ? "Select your numbers" : "Roll the dice"}</div>
-          }
         </div>
       </div>
     </div>
@@ -119,6 +121,9 @@ const styles = StyleSheet.create({
       padding: '24px 0 48px',
     },
   },
+  actionsContainer: {
+
+  },
   diceSurface: {
     flex: 1,
     width: '100%',
@@ -163,6 +168,9 @@ const styles = StyleSheet.create({
     cursor: 'unset',
     opacity: 0.5,
     backgroundColor: 'white',
+  },
+  numberSelectedOverlay: {
+
   },
 });
 

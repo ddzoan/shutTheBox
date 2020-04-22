@@ -1,5 +1,6 @@
 import {sumArray, isPossible, canSelectNumbers} from "./gameHelpers";
 export const ROLL_DICE = "ROLL_DICE";
+export const FINISH_ROLL_DICE = "FINISH_ROLL_DICE";
 export const TOGGLE_CHOICE = "TOGGLE_CHOICE";
 export const FINALIZE_SELECTION = "FINALIZE_SELECTION";
 export const NEW_GAME = "NEW_GAME";
@@ -7,7 +8,9 @@ export const NEW_GAME = "NEW_GAME";
 const reducer = (state, action) => {
   switch(action.type) {
     case ROLL_DICE:
-      return rollDiceReducer(state);
+      return rollDiceReducer(state, action.dispatch);
+    case FINISH_ROLL_DICE:
+      return finishRollDiceReducer(state);
     case TOGGLE_CHOICE:
       return toggleChoiceReducer(state, action.payload);
     case FINALIZE_SELECTION:
@@ -24,12 +27,13 @@ export const getInitialState = (dice) => ({
   availableChoices: allChoices(),
   pickingNumbers: false,
   needsToRoll: true,
+  rolling: false,
   selectedNumbers: new Set(),
   gameOver: false,
   winner: false,
 });
 
-const rollDiceReducer = (state) => {
+const rollDiceReducer = (state, dispatch) => {
   const {gameOver, needsToRoll, availableChoices} = state;
   if(gameOver || !needsToRoll) {
     return state;
@@ -38,15 +42,24 @@ const rollDiceReducer = (state) => {
   const dice = shouldRollTwoDice ? [rollDie(), rollDie()] : [rollDie()];
 
   const isGameOver = !isPossible([...availableChoices], 0, sumArray(dice));
+  setTimeout(() => dispatch({type: FINISH_ROLL_DICE}), 1500);
   return {
     dice,
     availableChoices,
     pickingNumbers: !isGameOver,
     needsToRoll: false,
+    rolling: true,
     selectedNumbers: new Set(),
     gameOver: isGameOver,
     winner: false,
   }
+};
+
+const finishRollDiceReducer = (state) => {
+  return {
+    ...state,
+    rolling: false,
+  };
 };
 
 const toggleChoiceReducer = (state, choice) => {

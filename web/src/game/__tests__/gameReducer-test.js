@@ -1,4 +1,11 @@
-import reducer, {FINALIZE_SELECTION, getInitialState, NEW_GAME, ROLL_DICE, TOGGLE_CHOICE} from '../gameReducer';
+import reducer, {
+  FINALIZE_SELECTION,
+  FINISH_ROLL_DICE,
+  getInitialState,
+  NEW_GAME,
+  ROLL_DICE,
+  TOGGLE_CHOICE
+} from '../gameReducer';
 
 describe('reducer', function () {
   describe('initial state', function () {
@@ -8,6 +15,7 @@ describe('reducer', function () {
         availableChoices: new Set([1,2,3,4,5,6,7,8,9]),
         pickingNumbers: false,
         needsToRoll: true,
+        rolling: false,
         selectedNumbers: new Set(),
         gameOver: false,
         winner: false,
@@ -20,6 +28,7 @@ describe('reducer', function () {
         availableChoices: new Set([1,2,3,4,5,6,7,8,9]),
         pickingNumbers: false,
         needsToRoll: true,
+        rolling: false,
         selectedNumbers: new Set(),
         gameOver: false,
         winner: false,
@@ -59,10 +68,44 @@ describe('reducer', function () {
       });
     });
 
+    describe('rolling state', function () {
+      beforeEach(() => {
+        jest.useFakeTimers();
+      });
+
+      it('should set rolling to true', function () {
+        const newState = reducer(readyToRollState, {type: ROLL_DICE});
+        expect(newState.rolling).toEqual(true);
+      });
+
+      it('should dispatch the finish roll in 1.5 seconds', function () {
+        const dispatchSpy = jest.fn();
+        reducer(readyToRollState, {type: ROLL_DICE, dispatch: dispatchSpy});
+        expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 1500);
+
+        const setTimeoutFunction = setTimeout.mock.calls[0][0];
+        setTimeoutFunction();
+        expect(dispatchSpy).toHaveBeenCalledWith({type: FINISH_ROLL_DICE});
+      });
+    });
+
     describe('game over followup', function () {
       xit('should test game over states', function () {
 
       });
+    });
+  });
+
+  describe('finish roll dice', function () {
+    let rollingState;
+    beforeEach(() => {
+      rollingState = getInitialState([1,2]);
+      rollingState = reducer(rollingState, {type: ROLL_DICE});
+    });
+
+    it('should stop rolling dice', function () {
+      const newState = reducer(rollingState, {type: FINISH_ROLL_DICE});
+      expect(newState.rolling).toEqual(false);
     });
   });
 
