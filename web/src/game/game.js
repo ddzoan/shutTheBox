@@ -8,7 +8,7 @@ import {useKeyboardShortcuts} from "./gameKeyboardShortcuts";
 
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, null, getInitialState);
-  const {dice, availableChoices, pickingNumbers, needsToRoll, selectedNumbers, gameOver, winner} = state;
+  const {dice, availableChoices, pickingNumbers, needsToRoll, rolling, selectedNumbers, gameOver, winner} = state;
 
   useKeyboardShortcuts(dispatch);
 
@@ -31,16 +31,17 @@ const Game = () => {
         </div>
         <div className={css(styles.diceSurface)}>
           <div className={css(styles.actionsContainer)}>
-            <div>
-              <button
-                onClick={() => dispatch({type: ROLL_DICE, dispatch})}
-                disabled={!needsToRoll}
-              >
-                Roll
-              </button>
-            </div>
-            {
-              gameOver ?
+            {!rolling && (!gameOver ?
+              (
+              <div>
+                <button
+                  onClick={() => dispatch({type: ROLL_DICE, dispatch})}
+                  disabled={!needsToRoll}
+                >
+                  Roll
+                </button>
+              </div>
+              ) :
                 (
                   <div>
                     <div>GAME OVER</div>
@@ -57,8 +58,7 @@ const Game = () => {
                     <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
                   </div>
                 )
-                : <div>{pickingNumbers ? "Select your numbers" : "Roll the dice"}</div>
-            }
+            )}
           </div>
           <Dice dice={dice} needsToRoll={needsToRoll}/>
         </div>

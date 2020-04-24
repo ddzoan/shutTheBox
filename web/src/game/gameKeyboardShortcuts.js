@@ -6,7 +6,7 @@ export const useKeyboardShortcuts = (dispatch) => {
     const handleKeypress = event => {
       switch(event.key) {
         case "r":
-          dispatch({type: ROLL_DICE});
+          dispatch({type: ROLL_DICE, dispatch});
           break;
         case "n":
           dispatch({type: NEW_GAME});
