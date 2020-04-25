@@ -108,6 +108,9 @@ const selectedNumbersValid = (selectedNumbers, availableNumbers) =>
 
 const allChoices = () => new Set([...Array(9).keys()].map(i => i + 1));
 
-const newGameReducer = (state) => getInitialState(state.dice);
+const newGameReducer = (state) => {
+  const newDice = state.dice.length === 1 ? state.dice.concat(rollDie()) : state.dice;
+  return getInitialState(newDice);
+};
 
 export default reducer;

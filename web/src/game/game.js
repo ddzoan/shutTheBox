@@ -55,17 +55,17 @@ const GameOverOverlay = ({winner, availableChoices, dispatch}) => (
   <>
     <div className={css(styles.gameOverContainer, styles.gameOverOverlay)}/>
     <div className={css(styles.gameOverContainer)}>
-      {winner ?
-        <div className={css(styles.gameOverTextContainer)}>
+      <div className={css(styles.gameOverTextContainer)}>
+        {winner ?
           <span>You shut the box!!!</span>
-        </div>
-        :
-        <div className={css(styles.gameOverTextContainer)}>
-          <span>nope</span>
-          <span>{[...availableChoices].join(' + ')}{availableChoices.size > 1 && ` = ${sumArray([...availableChoices])}`}</span>
-          <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
-        </div>
-      }
+          :
+          <>
+            <span>nope</span>
+            <span>{[...availableChoices].join(' + ')}{availableChoices.size > 1 && ` = ${sumArray([...availableChoices])}`}</span>
+          </>
+        }
+        <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
+      </div>
     </div>
   </>
 );

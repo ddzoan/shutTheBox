@@ -218,5 +218,12 @@ describe('reducer', function () {
       const newState = reducer(initialState, {type: NEW_GAME});
       expect(newState.dice).toEqual([1,2]);
     });
+
+    it('should add a dice if previous dice state only had 1', function () {
+      const oldDice = [1];
+      let initialState = getInitialState(oldDice);
+      const newState = reducer(initialState, {type: NEW_GAME});
+      expect(newState.dice.length).toEqual(2);
+    });
   });
 });
