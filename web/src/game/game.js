@@ -5,6 +5,7 @@ import Dice from "./dice";
 import reducer, {getInitialState, ROLL_DICE, NEW_GAME, FINALIZE_SELECTION, TOGGLE_CHOICE} from './gameReducer';
 import {sumArray, possibleChoices, canSelectNumbers, rollDie} from './gameHelpers';
 import {useKeyboardShortcuts} from "./gameKeyboardShortcuts";
+import Fireworks from "./fireworks";
 
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, [rollDie(), rollDie()], getInitialState);
@@ -54,6 +55,11 @@ const Game = () => {
 const GameOverOverlay = ({winner, availableChoices, dispatch}) => (
   <>
     <div className={css(styles.gameOverContainer, styles.gameOverOverlay)}/>
+    { winner &&
+      <div className={css(styles.gameOverContainer)}>
+        <Fireworks/>
+      </div>
+    }
     <div className={css(styles.gameOverContainer)}>
       <div className={css(styles.gameOverTextContainer)}>
         {winner ?
