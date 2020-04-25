@@ -30,6 +30,7 @@ const Game = () => {
           </button>
         </div>
         <div className={css(styles.diceSurface)}>
+          <Dice dice={dice} needsToRoll={needsToRoll}/>
           <div className={css(styles.actionsContainer)}>
             {!rolling && (!gameOver ?
               (
@@ -60,7 +61,6 @@ const Game = () => {
                 )
             )}
           </div>
-          <Dice dice={dice} needsToRoll={needsToRoll}/>
         </div>
       </div>
     </div>
@@ -122,13 +122,16 @@ const styles = StyleSheet.create({
     },
   },
   actionsContainer: {
-
+    position: 'absolute',
+    top: 0,
   },
   diceSurface: {
     flex: 1,
     width: '100%',
     backgroundImage: 'none',
     backgroundColor: '#076324',
+    position: 'relative',
+    paddingTop: 48,
   },
   allNumbersContainer: {
     display: 'flex',
