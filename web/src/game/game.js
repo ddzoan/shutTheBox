@@ -31,10 +31,10 @@ const Game = () => {
         </div>
         <div className={css(styles.diceSurface)}>
           <Dice dice={dice} needsToRoll={needsToRoll}/>
-          {!rolling && gameOver && <div className={css(styles.diceOverlay)}/>}
+          {!rolling && gameOver && <GameOverOverlay availableChoices={availableChoices} winner={winner} dispatch={dispatch} />}
           <div className={css(styles.actionsContainer)}>
-            {!rolling && (!gameOver ?
-              (needsToRoll &&
+            {!rolling && needsToRoll && !gameOver &&
+              (
               <div>
                 <button
                   onClick={() => dispatch({type: ROLL_DICE, dispatch})}
@@ -42,30 +42,30 @@ const Game = () => {
                   Roll
                 </button>
               </div>
-              ) :
-                (
-                  <div>
-                    <div>GAME OVER</div>
-                    {
-                      winner ?
-                        <div>You shut the box!!!</div>
-                        :
-                        <>
-                          <div>{JSON.stringify([...availableChoices])}</div>
-                          <div>Total <span>{sumArray([...availableChoices])}</span></div>
-                        </>
-                    }
-
-                    <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
-                  </div>
-                )
-            )}
+              )
+            }
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const GameOverOverlay = ({winner, availableChoices, dispatch}) => (
+  <div className={css(styles.gameOverOverlay)}>
+    {winner ?
+      <div className={css(styles.gameOverTextContainer)}>
+        <span>You shut the box!!!</span>
+      </div>
+      :
+      <div className={css(styles.gameOverTextContainer)}>
+        <span>nope</span>
+        <span>{[...availableChoices].join(' + ')}{availableChoices.size > 1 && ` = ${sumArray([...availableChoices])}`}</span>
+        <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
+      </div>
+    }
+  </div>
+);
 
 const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameOver}) => {
   return (
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     paddingTop: 48,
   },
-  diceOverlay: {
+  gameOverOverlay: {
     position: 'absolute',
     backgroundColor: 'black',
     opacity: 0.3,
@@ -141,6 +141,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    textAlign: 'center',
+    padding: 24,
+  },
+  gameOverTextContainer: {
+    backgroundColor: 'white',
+    padding: 8,
+    display: 'inline-flex',
+    flexDirection: 'column',
   },
   allNumbersContainer: {
     display: 'flex',
