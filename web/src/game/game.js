@@ -3,11 +3,11 @@ import {StyleSheet, css} from 'aphrodite/no-important';
 import woodPattern from './wood-pattern.png';
 import Dice from "./dice";
 import reducer, {getInitialState, ROLL_DICE, NEW_GAME, FINALIZE_SELECTION, TOGGLE_CHOICE} from './gameReducer';
-import {sumArray, possibleChoices, canSelectNumbers} from './gameHelpers';
+import {sumArray, possibleChoices, canSelectNumbers, rollDie} from './gameHelpers';
 import {useKeyboardShortcuts} from "./gameKeyboardShortcuts";
 
 const Game = () => {
-  const [state, dispatch] = useReducer(reducer, null, getInitialState);
+  const [state, dispatch] = useReducer(reducer, [rollDie(), rollDie()], getInitialState);
   const {dice, availableChoices, pickingNumbers, needsToRoll, rolling, selectedNumbers, gameOver, winner} = state;
 
   useKeyboardShortcuts(dispatch);
@@ -31,6 +31,7 @@ const Game = () => {
         </div>
         <div className={css(styles.diceSurface)}>
           <Dice dice={dice} needsToRoll={needsToRoll}/>
+          {!rolling && gameOver && <div className={css(styles.diceOverlay)}/>}
           <div className={css(styles.actionsContainer)}>
             {!rolling && (!gameOver ?
               (needsToRoll &&
@@ -131,6 +132,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#076324',
     position: 'relative',
     paddingTop: 48,
+  },
+  diceOverlay: {
+    position: 'absolute',
+    backgroundColor: 'black',
+    opacity: 0.3,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   allNumbersContainer: {
     display: 'flex',

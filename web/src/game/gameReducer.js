@@ -1,4 +1,4 @@
-import {sumArray, isPossible, canSelectNumbers} from "./gameHelpers";
+import {sumArray, isPossible, canSelectNumbers, rollDie} from "./gameHelpers";
 export const ROLL_DICE = "ROLL_DICE";
 export const FINISH_ROLL_DICE = "FINISH_ROLL_DICE";
 export const TOGGLE_CHOICE = "TOGGLE_CHOICE";
@@ -105,8 +105,6 @@ const finalizeSelectionReducer = (state) => {
 
 const selectedNumbersValid = (selectedNumbers, availableNumbers) =>
   [...selectedNumbers].every(num => availableNumbers.has(num));
-
-const rollDie = () => Math.ceil(Math.random()*6);
 
 const allChoices = () => new Set([...Array(9).keys()].map(i => i + 1));
 
