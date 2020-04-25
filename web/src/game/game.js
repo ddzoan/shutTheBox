@@ -31,7 +31,6 @@ const Game = () => {
         </div>
         <div className={css(styles.diceSurface)}>
           <Dice dice={dice} needsToRoll={needsToRoll}/>
-          {!rolling && gameOver && <GameOverOverlay availableChoices={availableChoices} winner={winner} dispatch={dispatch} />}
           <div className={css(styles.actionsContainer)}>
             {!rolling && needsToRoll && !gameOver &&
               (
@@ -45,6 +44,7 @@ const Game = () => {
               )
             }
           </div>
+          {!rolling && gameOver && <GameOverOverlay availableChoices={availableChoices} winner={winner} dispatch={dispatch} />}
         </div>
       </div>
     </div>
@@ -52,19 +52,22 @@ const Game = () => {
 };
 
 const GameOverOverlay = ({winner, availableChoices, dispatch}) => (
-  <div className={css(styles.gameOverOverlay)}>
-    {winner ?
-      <div className={css(styles.gameOverTextContainer)}>
-        <span>You shut the box!!!</span>
-      </div>
-      :
-      <div className={css(styles.gameOverTextContainer)}>
-        <span>nope</span>
-        <span>{[...availableChoices].join(' + ')}{availableChoices.size > 1 && ` = ${sumArray([...availableChoices])}`}</span>
-        <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
-      </div>
-    }
-  </div>
+  <>
+    <div className={css(styles.gameOverContainer, styles.gameOverOverlay)}/>
+    <div className={css(styles.gameOverContainer)}>
+      {winner ?
+        <div className={css(styles.gameOverTextContainer)}>
+          <span>You shut the box!!!</span>
+        </div>
+        :
+        <div className={css(styles.gameOverTextContainer)}>
+          <span>nope</span>
+          <span>{[...availableChoices].join(' + ')}{availableChoices.size > 1 && ` = ${sumArray([...availableChoices])}`}</span>
+          <button onClick={() => dispatch({type: NEW_GAME})}>Start new game</button>
+        </div>
+      }
+    </div>
+  </>
 );
 
 const Numbers = ({availableChoices, chosenNumbers, toggleChoice, disabled, gameOver}) => {
@@ -134,9 +137,11 @@ const styles = StyleSheet.create({
     paddingTop: 48,
   },
   gameOverOverlay: {
-    position: 'absolute',
     backgroundColor: 'black',
     opacity: 0.3,
+  },
+  gameOverContainer: {
+    position: 'absolute',
     top: 0,
     bottom: 0,
     left: 0,
