@@ -33,11 +33,10 @@ const Game = () => {
           <Dice dice={dice} needsToRoll={needsToRoll}/>
           <div className={css(styles.actionsContainer)}>
             {!rolling && (!gameOver ?
-              (
+              (needsToRoll &&
               <div>
                 <button
                   onClick={() => dispatch({type: ROLL_DICE, dispatch})}
-                  disabled={!needsToRoll}
                 >
                   Roll
                 </button>
